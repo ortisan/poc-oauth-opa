@@ -1,0 +1,10 @@
+version: "3.8"
+services:
+  opa:
+    image: openpolicyagent/opa:latest
+    container_name: opa-server
+    ports:
+      - "8181:8181"
+    volumes:
+      - ./opa-config:/policies
+    command: ["run", "--server", "--disable-telemetry", "/policies"]
