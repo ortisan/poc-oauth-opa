@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const configs = require("./configs");
+const {serverKey} = require("./configs");
 
 const users = [
   { id: 1, username: "marcelo", password: "password", roles: ["user"] },
@@ -22,14 +22,14 @@ module.exports = {
         user: user.username,
         scope: ["read", "write", "assume_role"], // Example scope
       },
-      configs.serverKey,
+      serverKey,
       { expiresIn: "1h" }
     );
     return { accessToken, client, user };
   },
   getAccessToken(accessToken) {
     try {
-      const decoded = jwt.verify(accessToken, configs.serverKey);
+      const decoded = jwt.verify(accessToken, serverKey);
       return { user: decoded.user, scope: decoded.scope };
     } catch (err) {
       return null;

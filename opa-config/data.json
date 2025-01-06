@@ -1,6 +1,0 @@
-{
-  "users": {
-    "admin": { "roles": ["admin"], "permissions": ["read", "write"] },
-    "guest": { "roles": ["guest"], "permissions": ["read"] }
-  }
-}

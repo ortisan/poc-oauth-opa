@@ -7,4 +7,10 @@ services:
       - "8181:8181"
     volumes:
       - ./opa-config:/policies
-    command: ["run", "--server", "--disable-telemetry", "/policies"]
+    networks:
+      - poc
+    command: ["run", "--server", "/policies"]
+
+networks:
+  poc:
+    driver: bridge

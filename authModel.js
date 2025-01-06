@@ -1,18 +1,20 @@
 const jwt = require("jsonwebtoken");
-const configs = require("./configs");
+const {serverKey} = require("./configs");
+
+const users = [{ id: 1, username: "marcelo", password: "password" }];
 
 const clients = [
   {
     clientId: "marcelo",
-    clientSecret: "password",
-    grants: ["authorization_code"],
-    scope: "read write",
+    clientSecret: "secret",
+    grants: ["password", "authorization_code"],
+    scope: "read:profile write:profile write:cashout:payments read:cashout:payments",
   },
   {
     clientId: "system",
-    clientSecret: "password",
-    grants: ["authorization_code"],
-    scope: "read write",
+    clientSecret: "secret",
+    grants: ["password", "authorization_code"],
+    scope: "read:cashout:payments",
   },
 ];
 
@@ -27,6 +29,13 @@ module.exports = {
       (client) =>
         client.clientId === clientId && client.clientSecret === clientSecret
     );
+  },
+
+  getUser(username, password) {
+    const user = users.find(
+      (u) => u.username === username && u.password === password
+    );
+    return user ? user : null; // Return user if found, otherwise null
   },
 
   /**
@@ -78,15 +87,17 @@ module.exports = {
         clientId: client.clientId,
         scope: token.scope,
       },
-      configs.serverKey,
+      serverKey,
       { expiresIn: "1h" } // Token expiration
     );
 
-    tokens[jwtToken] = { client, user, scope: token.scope };
+    const accessTokenExpiresAt= new Date(Date.now() + 3600 * 1000);
+
+    tokens[jwtToken] = { client, user, scope: token.scope, accessTokenExpiresAt };
 
     return {
       accessToken: jwtToken,
-      accessTokenExpiresAt: new Date(Date.now() + 3600 * 1000), // 1 hour
+      accessTokenExpiresAt, // 1 hour
       client,
       user,
     };
@@ -97,12 +108,13 @@ module.exports = {
    */
   getAccessToken(accessToken) {
     try {
-      const decoded = jwt.verify(accessToken, configs.serverKey);
+      const decoded = jwt.verify(accessToken, serverKey);
       return {
         accessToken,
         client: clients.find((c) => c.clientId === decoded.clientId),
         user: users.find((u) => u.id === decoded.userId),
         scope: decoded.scope,
+        accessTokenExpiresAt: new Date(decoded.exp * 1000)
       };
     } catch (err) {
       return null; // Token invalid or expired

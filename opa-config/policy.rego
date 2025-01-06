@@ -1,17 +1,18 @@
-package example
+package payments
 
-# Default deny
-default allow = false
+import rego.v1
 
-# Allow based on user roles
-allow {
-  input.user == "admin"
+default allow := false
+
+create if contains(input.client.scope, "write:cashout:payments")
+read if {
+	create
+	contains(input.client.scope, "read:cashout:payments")
 }
 
-# Return allowed actions for a user
-actions = {"read", "write"} {
-  input.user == "admin"
-}
-actions = {"read"} {
-  input.user == "guest"
+operationOpts["autoApprove"]:= contains(input.client.scope, "auto-approve:cashout:payments")
+
+allow if {
+	create
+  read
 }
