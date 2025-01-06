@@ -6,7 +6,8 @@ services:
     ports:
       - "8181:8181"
     volumes:
-      - ./opa-config:/policies
+      - ./opa-config/policy-payment.rego:/policies
+      - ./opa-config/policy-payment-decode-token.rego:/policies
     networks:
       - poc
     command: ["run", "--server", "/policies"]

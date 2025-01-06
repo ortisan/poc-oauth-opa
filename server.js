@@ -1,7 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const { oauthServer, Request, Response } = require("./oauthServer"); // Import your OAuth2 server instance
-const checkScope = require("./scopeMiddleware");
+const { checkScope, checkScopeOpa } = require("./scopeMiddleware");
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -29,10 +29,14 @@ app.post(
   "/secure/payments",
   checkScope("write:cashout:payments"),
   (req, res) => {
-    
     res.status(201).json({ message: "payment sheduled", ...req.body });
   }
 );
+
+app.post("/secure-jwt-decode/payments", checkScopeOpa(), (req, res) => {
+  const auth = req.auth;
+  res.status(201).json({ message: "payment sheduled", ...req.body, auth });
+});
 
 app.listen(3000, () =>
   console.log("OAuth2 Server running on http://localhost:3000")
