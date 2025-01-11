@@ -1,0 +1,267 @@
+{
+	"info": {
+		"_postman_id": "e3940b46-e6fc-4e19-a85f-a57649faaef9",
+		"name": "Poc Oauth Opa",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "818308"
+	},
+	"item": [
+		{
+			"name": "Token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Set environment with response accessToken field\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.environment.set(\"accessToken\", jsonData.accessToken);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "grant_type",
+							"value": "password",
+							"type": "text"
+						},
+						{
+							"key": "client_id",
+							"value": "marcelo",
+							"type": "text"
+						},
+						{
+							"key": "client_secret",
+							"value": "secret",
+							"type": "text"
+						},
+						{
+							"key": "username",
+							"value": "marcelo",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "password",
+							"type": "text"
+						},
+						{
+							"key": "scope",
+							"value": "write:cashout:payments read:cashout:payments read:profile",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:3000/oauth/token",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"oauth",
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Secure Profile",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{accessToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/secure/profile",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"secure",
+						"profile"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Secure Payments",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{accessToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"amount\":100.0,\n    \"paymentDate\": \"2025-01-31\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/secure/payments",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"secure",
+						"payments"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Secure Payments Jwt Token",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{accessToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"amount\":100.0,\n    \"paymentDate\": \"2025-01-31\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/secure/payments",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"secure",
+						"payments"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Opa-Jwt-Decode",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"input\": {\r\n        \"token\": \"{{accessToken}}\"\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8181/v1/data/payments_jwt_decode",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8181",
+					"path": [
+						"v1",
+						"data",
+						"payments_jwt_decode"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Opa",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"input\": {\r\n        \"accessToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImNsaWVudElkIjoibWFyY2VsbyIsInNjb3BlIjoid3JpdGU6Y2FzaG91dDpwYXltZW50cyByZWFkOmNhc2hvdXQ6cGF5bWVudHMgcmVhZDpwcm9maWxlIiwiaWF0IjoxNzM2MTI3ODQ0LCJleHAiOjE3MzYxMzE0NDR9.E8WTytV-qSFc8M0kdVDLNOkE5cJqAPmqpQN5dC4iTr8\",\r\n        \"accessTokenExpiresAt\": \"2025-01-06T02:44:08.129Z\",\r\n        \"client\": {\r\n            \"clientId\": \"marcelo\",\r\n            \"clientSecret\": \"secret\",\r\n            \"grants\": [\r\n                \"password\",\r\n                \"authorization_code\"\r\n            ],\r\n            \"scope\": \"read:profile write:profile write:cashout:payments read:cashout:payments\"\r\n        },\r\n        \"user\": {\r\n            \"id\": 1,\r\n            \"username\": \"marcelo\",\r\n            \"password\": \"password\"\r\n        }\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8181/v1/data/payments",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8181",
+					"path": [
+						"v1",
+						"data",
+						"payments"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
