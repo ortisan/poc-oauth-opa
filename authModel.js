@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const {serverKey} = require("./configs");
+const { serverKey } = require("./configs");
 
 const users = [{ id: 1, username: "marcelo", password: "password" }];
 
@@ -8,7 +8,8 @@ const clients = [
     clientId: "marcelo",
     clientSecret: "secret",
     grants: ["password", "authorization_code"],
-    scope: "read:profile write:profile write:cashout:payments read:cashout:payments",
+    scope:
+      "read:profile write:profile write:cashout:payments read:cashout:payments auto-approve:cashout:payments",
   },
   {
     clientId: "system",
@@ -91,9 +92,14 @@ module.exports = {
       { expiresIn: "1h" } // Token expiration
     );
 
-    const accessTokenExpiresAt= new Date(Date.now() + 3600 * 1000);
+    const accessTokenExpiresAt = new Date(Date.now() + 3600 * 1000);
 
-    tokens[jwtToken] = { client, user, scope: token.scope, accessTokenExpiresAt };
+    tokens[jwtToken] = {
+      client,
+      user,
+      scope: token.scope,
+      accessTokenExpiresAt,
+    };
 
     return {
       accessToken: jwtToken,
@@ -114,7 +120,7 @@ module.exports = {
         client: clients.find((c) => c.clientId === decoded.clientId),
         user: users.find((u) => u.id === decoded.userId),
         scope: decoded.scope,
-        accessTokenExpiresAt: new Date(decoded.exp * 1000)
+        accessTokenExpiresAt: new Date(decoded.exp * 1000),
       };
     } catch (err) {
       return null; // Token invalid or expired

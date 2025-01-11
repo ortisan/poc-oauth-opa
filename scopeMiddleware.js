@@ -17,9 +17,26 @@ const checkScope = (requiredScope) => async (req, res, next) => {
       return res.status(403).json({ error: "Insufficient scope" });
     }
 
-    const policies = await checkPolicy("payments", token);
+    // Token and scope are valid
+    next();
+  } catch (err) {
+    return res.status(401).json({ error: "Unauthorized or invalid token" });
+  }
+};
 
-    console.log(policies);
+const checkScopeOpa = () => async (req, res, next) => {
+  const request = new Request(req);
+  const response = new Response(res);
+
+  try {
+    // Authenticate token and extract its details
+    const token = getAccessToken(request);
+
+    const policyResult = await checkPolicy("payments_jwt_decode", { token });
+
+    req.auth = {
+      ...policyResult,
+    };
 
     // Token and scope are valid
     next();
@@ -31,8 +48,24 @@ const checkScope = (requiredScope) => async (req, res, next) => {
 const opaClient = require("./opaClient");
 
 async function checkPolicy(policyPath, input) {
-    const response = await opaClient.post(`/data/${policyPath}`, { input });
-    return response;
+  const response = await opaClient.post(`/data/${policyPath}`, { input });
+  return response.data.result;
 }
 
-module.exports = checkScope;
+function getAccessToken(request) {
+  var token = request.get("Authorization");
+  var matches = token.match(/Bearer\s(\S+)/);
+
+  if (!matches) {
+    throw new InvalidRequestError(
+      "Invalid request: malformed authorization header"
+    );
+  }
+
+  return matches[1];
+}
+
+module.exports = {
+  checkScope,
+  checkScopeOpa,
+};

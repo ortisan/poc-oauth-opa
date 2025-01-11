@@ -2,11 +2,6 @@
 
 This poc demonstrate the possibilities of Oauth and Opa into the authorization pipeline.
 
-## Running
-
-```sh
-docker-compose up -d
-```
 ## Questions
 
 Minha aplicaćão está tomando decisões pelo cliente?
@@ -65,12 +60,12 @@ Scopes define what a client can access on the resource server.
 
 Examples:
 
-| **Scope Name**   | **Description**                  |
-|------------------|----------------------------------|
-| `read:profile`   | Read user's profile.            |
-| `write:profile`  | Modify user's profile.          |
-| `read:files`     | Access user's files.            |
-| `write:files`    | Upload or edit files.           |
+| **Scope Name**  | **Description**        |
+| --------------- | ---------------------- |
+| `read:profile`  | Read user's profile.   |
+| `write:profile` | Modify user's profile. |
+| `read:files`    | Access user's files.   |
+| `write:files`   | Upload or edit files.  |
 
 ## Concepts
 
@@ -111,4 +106,16 @@ A fundamental concept of OPA is the separation of policy decision-making from en
 OPA policies are expressed in a high-level declarative language called Rego. Rego (pronounced “ray-go”) is purpose-built for expressing policies over complex hierarchical data structures. This allows the implementation of policy-as-code.
 
 
-curl localhost:8181 -i -d @input.json -H 'Content-Type: application/json'
+## Runing Poc
+
+Start auth server: 
+
+```bash
+node server.js
+```
+
+Start OPA:
+
+```bash
+docker compose up --build
+```
